@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<title>Admin Dashboard</title>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+
+<header class="bg-[#701382] text-white text-center p-10 relative">
+
+<div class="absolute top-4 left-6">
+<a href="#" onclick="logout()" class="text-xl hover:underline">Logout</a>
+</div>
+
+<h1 class="font-bold text-6xl mt-12 mb-16">DonateToCare</h1>
+
+</header>
+
+</div>
+
+<main>
+
+<div class="min-h-[80vh] px-10">
+
+<h2 id="adminName" class="text-4xl font-bold mt-10 mb-10">
+Welcome, Admin
+</h2>
+
+
+<div class="grid grid-cols-3 gap-6 mb-10">
+
+<div class="bg-white p-6 shadow rounded text-center">
+<h3 class="text-xl">Total Donations</h3>
+<p id="total" class="text-3xl font-bold">0</p>
+</div>
+
+<div class="bg-yellow-200 p-6 shadow rounded text-center">
+<h3 class="text-xl">Pending</h3>
+<p id="pending" class="text-3xl font-bold">0</p>
+</div>
+
+<div class="bg-green-200 p-6 shadow rounded text-center">
+<h3 class="text-xl">Accepted</h3>
+<p id="accepted" class="text-3xl font-bold">0</p>
+</div>
+
+</div>
+
+<!-- DONATIONS -->
+<h3 class="text-3xl mb-4">All Donations</h3>
+
+<div class="overflow-x-auto">
+<table class="min-w-full border text-left">
+<thead class="bg-gray-200">
+<tr>
+<th class="p-2">ID</th>
+<th class="p-2">Name</th>
+<th class="p-2">Category</th>
+<th class="p-2">Amount</th>
+<th class="p-2">Payment</th>
+<th class="p-2">Status</th>
+<th class="p-2">Action</th>
+</tr>
+</thead>
+
+<tbody id="donationTable"></tbody>
+
+</table>
+</div>
+
+<!-- USERS -->
+<h3 class="text-3xl mt-10 mb-4">Registered Users</h3>
+<div id="userList" class="space-y-3"></div>
+
+</div>
+
+</main>
+
+<footer class="bg-[#701382] text-white text-center py-4 mt-10">
+DonateToCare 2026
+</footer>
+
+<script>
+const BASE_URL = "http://localhost/Donation-System/backend/api/";
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    if(localStorage.getItem("role") !== "admin"){
+        alert("Access denied");
+        window.location.href = "login.html";
+        return;
+    }
+
+    loadStats();
+    loadDonations();
+    loadUsers();
+
+    document.getElementById("adminName").innerText =
+        "Welcome, " + (localStorage.getItem("user_name") || "Admin");
+});
+
+
+
+async function loadStats(){
+    const res = await fetch(BASE_URL + "admin_status.php");
+    const data = await res.json();
+
+    document.getElementById("total").innerText = data.total;
+    document.getElementById("pending").innerText = data.pending;
+    document.getElementById("accepted").innerText = data.accepted;
+}
+
+
+
+async function loadDonations(){
+
+    const res = await fetch(BASE_URL + "get_donation.php");
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(d => {
+        html += `
+        <tr>
+            <td class="p-2">${d.id}</td>
+            <td class="p-2">${d.name}</td>
+            <td class="p-2">${d.category}</td>
+            <td class="p-2">BDT ${d.amount}</td>
+            <td class="p-2">${d.payment_method}</td>
+            <td class="p-2">${d.status}</td>
+            <td class="p-2">
+                <button onclick="updateStatus(${d.id}, 'accepted')" class="bg-green-500 text-white px-2 py-1">Accept</button>
+                <button onclick="updateStatus(${d.id}, 'pending')" class="bg-yellow-500 text-white px-2 py-1">Pending</button>
+            </td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("donationTable").innerHTML = html;
+}
+
+
+async function updateStatus(id, status){
+
+    await fetch(BASE_URL + "update_status.php", {
+        method: "POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: `id=${id}&status=${status}`
+    });
+
+    loadDonations();
+    loadStats();
+}
+
+
+async function loadUsers(){
+
+    const res = await fetch(BASE_URL + "admin_dashboard.php");
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach((u, i) => {
+        html += `
+        <div class="border p-3">
+            <b>${i+1}. ${u.name}</b><br>
+            ${u.email}
+        </div>
+        `;
+    });
+
+    document.getElementById("userList").innerHTML = html;
+}
+
+function logout(){
+    localStorage.clear();
+    window.location.href = "admin.html";
+}
+</script>
+
+</body>
+</html>
