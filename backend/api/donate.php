@@ -23,6 +23,8 @@ if($conn->query($sql)){
         "donation_id"=>$donation_id
     ]);
 }else{
-    echo json_encode(["error"=>"Donation failed"]);
+   echo json_encode([
+    "error" => $conn->error
+]);
 }
 ?>
