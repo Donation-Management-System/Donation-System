@@ -84,8 +84,8 @@ async function loginUser() {
 
         const result = await res.json();
 
-        if(result.message){
-            // Save user
+       if(result.status === "success"){
+          
             localStorage.setItem("user_id", result.user_id);
             localStorage.setItem("user_name", result.name);
             localStorage.setItem("role", result.role);
@@ -95,7 +95,7 @@ async function loginUser() {
             if(result.role === "admin"){
                 window.location.href = "admin-dashboard.html";
             } else {
-                window.location.href = "category.html";
+                window.location.href = "categories.html";
             }
 
         } else {
