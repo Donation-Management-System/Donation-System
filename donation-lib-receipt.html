@@ -1,74 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Student Donation Receipt - Donation System</title>
-    <link rel="stylesheet" href="tailwind.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<title>Donation Receipt</title>
 </head>
-<body class=" bg-gray-50 font-inter ">
-    <div class="max-w-7xl mx-auto  bg-white shadow mt-10">
 
-    <header class="bg-[#701382] text-white text-center p-10 relative ">
+<body class="bg-gray-50">
 
-      
-        
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
 
-        <h1 class="font-bold text-6xl md:text-5xl mt-12 mb-16 ">DonateToCare</h1>
+<header class="bg-[#701382] text-white text-center p-10">
+<h1 class="font-bold text-6xl">DonateToCare</h1>
+</header>
 
-        
-        
-        
+</div>
 
-    </header>
+<main>
+<div class="min-h-[60vh]">
 
-    </div>
+<h2 class="text-4xl text-center mt-6 mb-20">Donation Receipt</h2>
 
-    <main>
+<div class="max-w-4xl mx-auto grid grid-cols-2 gap-y-6 text-2xl">
 
-    <div class="min-h-[60vh]">
+<div>Name:</div>
+<div id="name"></div>
 
-        <h2 class="text-4xl font-semibold text-center mt-6 mb-20">Donation receipt</h2>
-        
-        <div class="max-w-6xl mx-auto grid grid-cols-2 gap-y-6 text-3xl">
-                 
-            <div class="font-medium">Name:</div>
-            <div class="font-normal text-[#000000]">Username</div>
+<div>Email:</div>
+<div id="email"></div>
 
-            <div class="font-medium">Email:</div>
-            <div class="font-normal text-[#000000]">User_emai</div>
+<div>Donated for:</div>
+<div id="category"></div>
 
-            <div class="font-medium">Donated for:</div>
-            <div class="font-normal text-[#000000]">Sponsoring for setting up a library at a school</div>
+<div>Amount:</div>
+<div id="amount"></div>
 
-            <div class="font-medium">Amount:</div>
-            <div class="font-normal text-[#000000]">BDT 20000 <span>(received with thanks)</span></div>
+<div>Status:</div>
+<div id="status"></div>
 
+</div>
 
-        </div>
-      
+</div>
 
-
-    </div>
-
-    <div class="max-w-5xl mx-auto mt-10 mb-20 flex flex-col md:flex-row items-center justify-between gap-6">
-            <p class="text-xl font-medium text-gray-700">
-                Please visit your dashboard for tracking how your donation is being utilized
-            </p>
-            <a href="donor-dashboard.html">
-              <button class="bg-[#701382] text-white px-10 py-3 text-xl font-semibold hover:bg-purple-900 transition cursor-pointer"> Confirm 
-            </button>
-            </a>
-        </div>
+<div class="text-center mt-10 mb-20">
+<button onclick="goDashboard()" 
+class="bg-[#701382] text-white px-8 py-3 rounded">
+Confirm
+</button>
+</div>
 
 </main>
 
-
-<footer class="bg-[#701382] text-white text-center py-4 mb-10 max-w-7xl mx-auto ">
-
-    <p class="font-medium">Copyright DonateToCare 2026. All rights reserved.</p>
+<footer class="bg-[#701382] text-white text-center py-4">
+DonateToCare 2026
 </footer>
-    
+
+<script>
+const BASE_URL = "http://localhost/Donation-System/backend/api/";
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const donation_id = localStorage.getItem("donation_id");
+
+    if(!donation_id){
+        alert("No donation found!");
+        return;
+    }
+
+    try {
+        const res = await fetch(BASE_URL + "get_receipt.php?donation_id=" + donation_id);
+        const data = await res.json();
+
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
+        
+        document.getElementById("name").innerText = data.name;
+        document.getElementById("email").innerText = data.email;
+        document.getElementById("category").innerText = data.category;
+        document.getElementById("amount").innerText = "BDT " + data.amount;
+        document.getElementById("status").innerText = data.status;
+
+    } catch(err){
+        alert("Error loading receipt");
+        console.error(err);
+    }
+
+});
+
+
+function goDashboard(){
+    window.location.href = "donor-dashboard.html";
+}
+</script>
+
 </body>
 </html>
