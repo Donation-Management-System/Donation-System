@@ -27,34 +27,35 @@
 
     <main>
 
-    <div class="min-h-[80vh]">
+   <div class="min-h-[80vh]">
 
-        <h2 class=" text-[#701382] font-semibold text-4xl text-center mt-5 "  >Donor Login</h2>
-    <div class="max-w-2xl max-auto space-y-2">
-        <div class=" block font-medium text-2xl mb-10 ml-40 mt-10 ">
-            <label >Name</label>
-            <input type="text" class="w-full border border-black p-3">
-        </div>
-        <div class=" block font-medium text-2xl mb-10 ml-40 mt-10 ">
-            <label >Email</label>
-            <input type="text" class="w-full border border-black p-3">
-        </div>
-        <div class=" block font-medium text-2xl mb-10 ml-40 mt-10 ">
-            <label >Password</label>
-            <input type="text" class="w-full border border-black p-3">
-        </div>
+<h2 class="text-[#701382] font-semibold text-4xl text-center mt-5">
+    Donor Login
+</h2>
 
-        <a href="donor-dashboard.html">
+<div class="max-w-2xl mx-auto space-y-6">
 
-        <div>
-            <button class="bg-[#701382] text-white text-center px-6 py-3 font-medium text-2xl ml-40 mt-10 mb-10 cursor-pointer  hover:bg-purple-900 transition ">Log in</button>
-        </div>
-
-        </a>
-
+   
+    <div class="font-medium text-2xl mt-10">
+        <label>Email</label>
+        <input id="email" type="email" class="w-full border border-black p-3">
     </div>
 
+
+    <div class="font-medium text-2xl">
+        <label>Password</label>
+        <input id="password" type="password" class="w-full border border-black p-3">
     </div>
+
+   
+    <div class="text-center mt-6">
+        <button onclick="loginUser()" class="bg-[#701382] text-white px-6 py-3 rounded">
+            Login
+        </button>
+    </div>
+
+</div>
+</div>
 
 </main>
 
