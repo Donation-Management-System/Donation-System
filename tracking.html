@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+async function trackDonation() {
+    const id = document.getElementById("donation_id").value;
+
+    const res = await fetch(BASE_URL + "tracking.php?donation_id=" + id);
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(t => {
+        html += `<p>${t.status} - ${t.updated_at}</p>`;
+    });
+
+    document.getElementById("result").innerHTML = html;
+}
+</script>
+
     <title>Tracking - Donation System</title>
     <link rel="stylesheet" href="tailwind.css">
 </head>
@@ -13,13 +30,13 @@
     <header class="bg-[#701382] text-white text-center p-10 relative ">
 
       
-        
+        <input id="donation_id" placeholder="Enter Donation ID">
+<button onclick="trackDonation()">Track</button>
+
+<div id="result"></div>
+
 
         <h1 class="font-bold text-6xl md:text-5xl mt-12 mb-16 ">DonateToCare</h1>
-
-        
-        
-        
 
     </header>
 
@@ -59,6 +76,9 @@
 
     <p class="font-medium">Copyright DonateToCare 2026. All rights reserved.</p>
 </footer>
-    
+    <script>
+const BASE_URL = "http://localhost/Donation-System/backend/api/";
+</script>
+
 </body>
 </html>
