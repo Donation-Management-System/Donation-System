@@ -1,70 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Donor Dashboard - Donation System</title>
-    <link rel="stylesheet" href="tailwind.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<title>Donor Dashboard</title>
 </head>
-<body class=" bg-gray-50 font-inter ">
-    <div class="max-w-7xl mx-auto  bg-white shadow mt-10">
 
-    <header class="bg-[#701382] text-white text-center p-2 relative ">
+<body class="bg-gray-50">
 
-        <div class="absolute top-4 left-6">
-      <a href="index.html" class="text-xl font-semibold hover:underline">Logout</a>
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
 
-        </div>
+<header class="bg-[#701382] text-white text-center p-2 relative">
 
-        <h1 class="font-bold text-6xl md:text-5xl mt-12 mb-16 ">DonateToCare</h1>
+<div class="absolute top-4 left-6">
+<a href="#" onclick="logout()" class="text-xl hover:underline">Logout</a>
+</div>
+ 
+<h1 class="font-bold text-6xl mt-12 mb-16">DonateToCare</h1>
 
-         <div class="mb-6">
-                <a href="categories.html" class="text-2xl font-medium hover:underline mt-10">Go to homepage</a>
-            </div>
-        
-        
-        
+<div class="mb-6">
+<a href="categories.html" class="text-2xl hover:underline">Go to homepage</a>
+</div>
 
-    </header>
+</header>
 
-    </div>
+</div>
 
-    <main>
+<main>
 
-    <div class="min-h-[70vh]">
+<div class="min-h-[70vh]">
 
-        <h2 class=" text-black font-bold text-4xl  mb-10 mt-15 ml-32"  >Welcome, username!</h2>
-    
-      <div class="space-y-6">
+<h2 id="welcome" class="text-4xl font-bold mb-10 mt-10 ml-10">
+Welcome
+</h2>
 
-        <h3 class="font-medium text-3xl mt-15 ml-32">your donations:</h3>
+<h3 class="text-3xl ml-10">Your Donations:</h3>
 
-        <div class="flex items-center gap-10 font-normal text-3xl mt-15 ml-32">
-            <p> 1 . Sponsor the education of a child. (example)</p>
+<div id="donationsList" class="space-y-6 ml-10 mt-6"></div>
 
-
-             <a href="tracking.html">
-
-            <button class="bg-[#701382] text-white px-8 py-2 text-xl font-medium hover:bg-purple-900 transition cursor-pointer">
-                    Track
-                </button>
-
-                </a>
-        </div>
-
-      </div>
-    
-
-    </div>
+</div>
 
 </main>
 
-
-<footer class="bg-[#701382] text-white text-center py-4 mb-10 max-w-7xl mx-auto ">
-
-    <p class="font-medium">Copyright DonateToCare 2026. All rights reserved.</p>
+<footer class="bg-[#701382] text-white text-center py-4 mt-10 max-w-7xl mx-auto">
+    <p>Copyright DonateToCare 2026</p>
 </footer>
+
+<script>
+const BASE_URL = "http://localhost/Donation-System/backend/api/";
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const user_id = localStorage.getItem("user_id");
+
+    if(!user_id){
+        alert("Login first");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const res = await fetch(BASE_URL + "get_user_donations.php?user_id=" + user_id);
+        const data = await res.json();
+
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
     
+        document.getElementById("welcome").innerText = 
+            "Welcome, " + (data[0]?.name || "User");
+
+        let html = "";
+
+        if(data.length === 0 || data[0].id === null){
+            html = "<p>No donations yet.</p>";
+        } else {
+            data.forEach((d, index) => {
+                html += `
+                <div class="flex items-center gap-10 text-xl">
+                    <p>${index+1}. ${d.category} - BDT ${d.amount}</p>
+
+                    <button onclick="track(${d.id})"
+                    class="bg-[#701382] text-white px-6 py-2">
+                        Track
+                    </button>
+                </div>
+                `;
+            });
+        }
+
+        document.getElementById("donationsList").innerHTML = html;
+
+    } catch(err){
+        console.error(err);
+        alert("Error loading dashboard");
+    }
+});
+
+
+function track(id){
+    localStorage.setItem("donation_id", id);
+    window.location.href = "tracking.html";
+}
+
+
+function logout(){
+    localStorage.clear();
+    window.location.href = "login.html";
+}
+</script>
+<button onclick="goBack()" 
+class="fixed bottom-5 left-5 bg-[#701382] text-white px-5 py-2 rounded shadow hover:bg-purple-900 transition">
+    ← Back
+</button>
+
+<script>
+function goBack(){
+    window.history.back();
+}
+</script>
+
 </body>
 </html>
