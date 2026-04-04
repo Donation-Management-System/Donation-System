@@ -4,7 +4,8 @@ $user = "root";
 $pass = "";
 $dbname = "donation_db";
 
-$conn = new mysqli($host, $user, $pass, $dbname);
+$conn = new mysqli("localhost", "root", "", "donation_db");
+
 
 
 if ($conn->connect_error) {
