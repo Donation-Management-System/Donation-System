@@ -4,7 +4,8 @@ $user = "root";
 $pass = "";
 $dbname = "donation_db";
 
-$conn = new mysqli("localhost", "root", "", "donation_db");
+$conn = new mysqli("hostname", "username", "password", "dbname");
+
 
 
 
