@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<title>Make a Donation - Donation System</title>
+</head>
+
+<body class="bg-gray-50 font-inter">
+
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+
+<header class="bg-[#701382] text-white text-center p-10">
+    <h1 class="font-bold text-6xl mt-12 mb-16">DonateToCare</h1>
+</header>
+
+</div>
+
+<main>
+<div class="min-h-[60vh]">
+
+<h2 class="text-4xl font-semibold text-center mt-6 mb-10">
+    Make a Donation
+</h2>
+
+<div class="max-w-3xl mx-auto space-y-6 text-xl">
+
+    <!-- Donation ID -->
+    <div>
+        <h3>Donation ID: <span id="donationId"></span></h3>
+    </div>
+
+    <!-- NAME -->
+    <div>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" class="w-full border p-3">
+    </div>
+
+    <!-- EMAIL -->
+    <div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" class="w-full border p-3">
+    </div>
+
+    <!-- CATEGORY -->
+    <div>
+        <label for="category">Donated For</label>
+        <select id="category" name="category" class="w-full border p-3">
+            <option value="">Select a category</option>
+            <option value="education">Education</option>
+            <option value="animal">Animal Welfare</option>
+            <option value="welfare">Human Welfare</option>
+            <option value="religion">Religion</option>
+        </select>
+    </div>
+
+    <!-- AMOUNT -->
+    <div>
+        <label for="amount">Amount (BDT)</label>
+        <input id="amount" name="amount" type="number" class="w-full border p-3">
+    </div>
+
+    <!-- PAYMENT -->
+    <div>
+        <label for="payment">Payment Method</label>
+        <select id="payment" name="payment_method" class="w-full border p-3">
+            <option value="bkash">Bkash</option>
+            <option value="nagad">Nagad</option>
+        </select>
+    </div>
+
+    <!-- BUTTON -->
+    <div class="text-center">
+        <button type="button" onclick="makeDonation()" class="bg-[#701382] text-white px-8 py-3 rounded">
+            Donate Now
+        </button>
+    </div>
+
+</div>
+</div>
+</main>
+
+<footer class="bg-[#701382] text-white text-center py-4 mt-10 max-w-7xl mx-auto">
+    <p>Copyright DonateToCare 2026</p>
+</footer>
+
+<script>
+const BASE_URL = "../backend/api/";
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.getElementById("donationId").innerText = 
+        localStorage.getItem("donation_id") || "N/A";
+
+    document.getElementById("name").value = 
+        localStorage.getItem("user_name") || "";
+
+    document.getElementById("email").value = 
+        localStorage.getItem("user_email") || "";
+});
+
+
+async function makeDonation() {
+    const button = document.querySelector("button[type='button']");
+    const originalText = button.innerText;
+
+    const user_id = localStorage.getItem("user_id");
+
+    if(!user_id){
+        alert("Login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const category = document.getElementById("category").value;
+    const amount = parseFloat(document.getElementById("amount").value);
+    const payment = document.getElementById("payment").value;
+
+    // Validation
+    if (!name) {
+        alert("Name is required");
+        return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alert("Valid email is required");
+        return;
+    }
+    if (!category) {
+        alert("Please select a category");
+        return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+        alert("Amount must be a positive number");
+        return;
+    }
+    if (!payment) {
+        alert("Please select a payment method");
+        return;
+    }
+
+    const data = {
+        user_id: user_id,
+        category: category,
+        amount: amount,
+        payment_method: payment
+    };
+
+    // Loading state
+    button.innerText = "Processing...";
+    button.disabled = true;
+
+    try {
+        const res = await fetch(BASE_URL + "donate.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+            alert(result.message || "Donation successful!");
+
+            localStorage.setItem("donation_id", result.data.donation_id || result.donation_id);
+
+            // Reload page to show new ID
+            location.reload();
+
+        } else {
+            alert(result.message || "Donation failed");
+        }
+
+    } catch(err){
+        alert("Server error");
+        console.error(err);
+    } finally {
+        button.innerText = originalText;
+        button.disabled = false;
+    }
+}
+</script>
+
+</body>
+</html>

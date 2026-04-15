@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<title>Admin Login</title>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+
+<header class="bg-[#701382] text-white text-center p-10 relative">
+<div class="absolute top-4 left-6">
+<a href="index.html" class="text-xl hover:underline">Go Back</a>
+</div>
+
+<h1 class="font-bold text-6xl mt-12 mb-16">DonateToCare</h1>
+</header>
+
+</div>
+
+<main>
+
+<div class="min-h-[80vh]">
+
+<h2 class="text-[#701382] text-4xl text-center mt-5">
+Admin Login
+</h2>
+
+<div class="max-w-2xl mx-auto">
+
+<form action="../backend/api/admin.php" method="POST">
+
+<div class="mt-10">
+<label for="email">Email</label>
+<input id="email" name="email" type="email" class="w-full border p-3">
+</div>
+
+<div class="mt-6">
+<label for="password">Password</label>
+<input id="password" name="password" type="password" class="w-full border p-3">
+</div>
+
+<div class="text-center mt-6">
+<button type="button" onclick="adminLogin()" 
+class="bg-[#701382] text-white px-6 py-3">
+Login
+</button>
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</main>
+<script>
+const BASE_URL = "http://localhost/Donation-System-main/backend/api/";
+
+async function adminLogin(){
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch(BASE_URL + "admin.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({email, password})
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+        localStorage.setItem("role", "admin");
+        localStorage.setItem("user_name", result.data.name);
+
+        alert("Admin login successful");
+
+        window.location.href = "admin-dashboard.html";
+
+    } else {
+        alert(result.message || "Login failed");
+    }
+}
+</script>
+
+</body>
+</html>

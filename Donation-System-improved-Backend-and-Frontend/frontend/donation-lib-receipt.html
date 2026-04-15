@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<title>Donation Receipt</title>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+
+<header class="bg-[#701382] text-white text-center p-10">
+<h1 class="font-bold text-6xl">DonateToCare</h1>
+</header>
+
+</div>
+
+<main>
+<div class="min-h-[60vh]">
+
+<h2 class="text-4xl text-center mt-6 mb-20">Donation Receipt</h2>
+
+<div class="max-w-4xl mx-auto grid grid-cols-2 gap-y-6 text-2xl">
+
+<div>Name:</div>
+<div id="name">Loading...</div>
+
+<div>Email:</div>
+<div id="email">Loading...</div>
+
+<div>Donated for:</div>
+<div id="category">Loading...</div>
+
+<div>Amount:</div>
+<div id="amount">Loading...</div>
+
+<div>Status:</div>
+<div id="status">Loading...</div>
+
+</div>
+
+</div>
+
+<div class="text-center mt-10 mb-20">
+<button onclick="goDashboard()" 
+class="bg-[#701382] text-white px-8 py-3 rounded" aria-label="Go to donor dashboard">
+Go to Dashboard
+</button>
+</div>
+
+</main>
+
+<footer class="bg-[#701382] text-white text-center py-4">
+DonateToCare 2026
+</footer>
+
+<script>
+const BASE_URL = "../backend/api/";
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const donation_id = localStorage.getItem("donation_id");
+
+    if(!donation_id){
+        alert("No donation found!");
+        window.location.href = "donor-dashboard.html";
+        return;
+    }
+
+    try {
+        const res = await fetch(BASE_URL + "get_receipt.php?donation_id=" + donation_id);
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Error loading receipt");
+            return;
+        }
+
+        
+        document.getElementById("name").innerText = data.data.name;
+        document.getElementById("email").innerText = data.data.email;
+        document.getElementById("category").innerText = data.data.category;
+        document.getElementById("amount").innerText = "BDT " + data.data.amount;
+        document.getElementById("status").innerText = data.data.status;
+
+    } catch(err){
+        alert("Error loading receipt");
+        console.error(err);
+    }
+
+});
+
+
+function goDashboard(){
+    window.location.href = "donor-dashboard.html";
+}
+</script>
+
+</body>
+</html>
