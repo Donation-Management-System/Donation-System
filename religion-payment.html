@@ -3,75 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Student Sponsor Payment - Donation System</title>
-    <link rel="stylesheet" href="tailwind.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Religion Payment - Donation System</title>
 </head>
-<body class=" bg-gray-50 font-inter ">
-    <div class="max-w-7xl mx-auto  bg-white shadow mt-10">
 
-    <header class="bg-[#701382] text-white text-center p-10 relative ">
+<body class="bg-gray-50 font-inter">
 
-      <div class="absolute top-4 left-6">
-                <a href="religion.html" class="text-xl font-semibold hover:underline cursor-pointer">Go Back</a>
-            </div>
-        
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+<header class="bg-[#701382] text-white text-center p-10 relative">
+    <div class="absolute top-4 left-6">
+        <a href="religion.html" class="text-xl font-semibold hover:underline cursor-pointer">Go Back</a>
+    </div>
+    <h1 class="font-bold text-6xl md:text-5xl mt-12 mb-16">DonateToCare</h1>
+    <div class="mb-6">
+        <a href="donor-dashboard.html" class="text-2xl font-medium hover:underline cursor-pointer">Go to dashboard</a>
+    </div>
+</header>
+</div>
 
-        <h1 class="font-bold text-6xl md:text-5xl mt-12 mb-16 ">DonateToCare</h1>
+<main>
+<div class="min-h-[60vh]">
 
-        
-        <div class="mb-6">
-                <a href="donor-dashboard.html" class="text-2xl font-medium hover:underline cursor-pointer">Go to dashboard</a>
-            </div>
-        
+    <p class="text-4xl font-light mt-10 ml-31">
+        Give Zakat
+    </p>
 
-    </header>
+    <h3 class="text-2xl font-light mt-10 ml-31">Details</h3>
+    <!-- Admin note loads here -->
+    <p id="adminNote" class="text-xl font-light ml-31 mt-4 text-gray-700 max-w-4xl whitespace-pre-line"></p>
 
+    <h3 class="text-2xl font-light ml-31 mt-16">Pictures of evidences</h3>
+
+    <!-- Dynamic image container -->
+    <div id="imageContainer" class="flex gap-25 flex-wrap mb-16 mt-10 ml-31">
+        <!-- Placeholders shown until images load -->
+        <div class="w-58 h-38 bg-[#D9D9D9]"></div>
+        <div class="w-58 h-38 bg-[#D9D9D9]"></div>
+        <div class="w-58 h-38 bg-[#D9D9D9]"></div>
     </div>
 
-    <main>
-
-    <div class="min-h-[60vh]">
-
-        
-
-      <p class="text-4xl font-light mt-10 ml-31 ">
-                Give Zakat
-            </p>
-        <h3 class="text-2xl font-light mt-10 ml-31">Details</h3>
-
-        <h3 class="text-2xl font-light  ml-31 mt-60">Pictures of evidences</h3>
-
-        <div class="flex gap-25 mb-16 mt-10 ml-31 ">
-                <div class="w-58 h-38 bg-[#D9D9D9]"></div>
-                <div class="w-58 h-38 bg-[#D9D9D9]"></div>
-                <div class="w-58 h-38 bg-[#D9D9D9]"></div>
-        
-        <div class="mt-20">
-                <a href="religion-receipt.html">
-                    <button class="bg-[#701382] text-white px-10 py-3 text-2xl font-medium cursor-pointer hover:bg-purple-900 transition shadow-md">
-                        Donate now
-                    </button>
-                </a>
-            </div>
-        
-        
-        
-        
-        
-            </div>
-     
-            
-
+    <div class="mt-6 mb-16 ml-31">
+        <a href="donation-receipt.html">
+            <button class="bg-[#701382] text-white px-10 py-3 text-2xl font-medium cursor-pointer hover:bg-purple-900 transition shadow-md">
+                Donate now
+            </button>
+        </a>
     </div>
 
+</div>
 </main>
 
-
-<footer class="bg-[#701382] text-white text-center py-4 mb-10 max-w-7xl mx-auto ">
-
+<footer class="bg-[#701382] text-white text-center py-4 mb-10 max-w-7xl mx-auto">
     <p class="font-medium">Copyright DonateToCare 2026. All rights reserved.</p>
 </footer>
-    
+
+<script>
+const BASE_URL = "https://donation-system.great-site.net/backend/api/";
+const UPLOADS_URL = "https://donation-system.great-site.net/backend/uploads/";
+const CATEGORY = "religion";
+
+// Load admin note
+fetch(BASE_URL + "get_note.php?category=" + CATEGORY)
+.then(res => res.json())
+.then(data => {
+    const noteEl = document.getElementById("adminNote");
+    if(data.note && data.note.trim() !== ""){
+        noteEl.textContent = data.note;
+    }
+})
+.catch(e => console.error(e));
+
+// Load images
+fetch(BASE_URL + "get_images.php?category=" + CATEGORY)
+.then(res => res.json())
+.then(data => {
+    const container = document.getElementById("imageContainer");
+    if(data && data.length > 0){
+        container.innerHTML = "";
+        data.slice(0, 3).forEach(img => {
+            container.innerHTML += `
+                <div class="w-58 h-38">
+                    <img src="${UPLOADS_URL}${img.image}" class="w-full h-full object-cover rounded">
+                </div>`;
+        });
+    }
+    // if no images, placeholders remain
+})
+.catch(e => console.error(e));
+</script>
+
 </body>
 </html>
