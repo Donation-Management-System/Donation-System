@@ -1,4 +1,7 @@
-CREATE TABLE users (
+-- Donation System Database Schema
+-- Run this in your InfinityFree phpMyAdmin
+
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -8,7 +11,7 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE donations (
+CREATE TABLE IF NOT EXISTS donations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     category VARCHAR(50),
@@ -21,7 +24,7 @@ CREATE TABLE donations (
 );
 
 
-CREATE TABLE tracking (
+CREATE TABLE IF NOT EXISTS tracking (
     id INT AUTO_INCREMENT PRIMARY KEY,
     donation_id INT,
     status VARCHAR(100),
@@ -31,5 +34,10 @@ CREATE TABLE tracking (
 );
 
 
+-- 
+-- Password is: admin123
+-- (PHP password_hash('admin123', PASSWORD_DEFAULT) generates this hash)
 INSERT INTO users (name, email, password, role)
-VALUES ('Admin', 'admin@gmail.com', '12345', 'admin');
+VALUES ('Admin', 'admin@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+
+--
