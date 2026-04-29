@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Manage Images & Notes - Admin</title>
+    <script src="config.js"></script>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+<header class="bg-[#701382] text-white text-center p-10 relative">
+    <div class="absolute top-4 left-6">
+        <a href="admin-dashboard.html" class="text-xl hover:underline">← Back to Dashboard</a>
+    </div>
+    <h1 class="font-bold text-6xl mt-12 mb-16">DonateToCare</h1>
+</header>
+</div>
+
+<main class="p-10 max-w-7xl mx-auto">
+
+<!-- CATEGORY SELECTOR -->
+<div class="mb-8">
+    <h2 class="text-3xl font-semibold mb-4 text-[#701382]">Manage Images & Notes</h2>
+    <div class="flex gap-4 items-center">
+        <label class="text-xl font-medium">Select Category:</label>
+        <select id="categorySelect" onchange="onCategoryChange()" class="border border-gray-400 p-2 text-lg rounded">
+            <option value="student">Student Library</option>
+            <option value="religion">Religion (Zakat)</option>
+            <option value="tracking">Tracking Page</option>
+        </select>
+    </div>
+</div>
+
+<!-- NOTE SECTION -->
+<div class="mb-10 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+    <h3 class="text-2xl font-semibold mb-3 text-[#701382]">📝 Admin Note</h3>
+    <p id="noteDescription" class="text-gray-500 mb-3 text-sm">This note will appear under "Details" on the payment page.</p>
+    <textarea id="noteInput" rows="4"
+        class="w-full border border-gray-300 rounded p-3 text-lg resize-none focus:outline-none focus:border-[#701382]"
+        placeholder="Write details / notes here..."></textarea>
+    <button onclick="saveNote()"
+        class="mt-3 bg-[#701382] text-white px-8 py-2 rounded text-lg hover:bg-purple-900 transition">
+        Save Note
+    </button>
+    <span id="noteSaveMsg" class="ml-4 text-green-600 font-medium hidden">✅ Saved!</span>
+</div>
+
+<!-- IMAGE UPLOAD SECTION -->
+<div class="mb-10 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+    <h3 class="text-2xl font-semibold mb-3 text-[#701382]">🖼️ Upload Evidence Images</h3>
+    <p id="imageDescription" class="text-gray-500 mb-3 text-sm">Images will appear under "Pictures of evidences" on the payment page.</p>
+    <div class="flex gap-4 items-center">
+        <input type="file" id="imageInput" accept="image/*" class="border border-gray-300 p-2 rounded">
+        <button onclick="uploadImage()"
+            class="bg-[#701382] text-white px-6 py-2 rounded text-lg hover:bg-purple-900 transition">
+            Upload Image
+        </button>
+    </div>
+    <span id="uploadMsg" class="ml-2 text-green-600 font-medium hidden mt-2 block">✅ Uploaded!</span>
+</div>
+
+<!-- IMAGE LIST -->
+<div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+    <h3 class="text-2xl font-semibold mb-4 text-[#701382]">📁 Current Images</h3>
+    <div id="imageList" class="grid grid-cols-3 gap-6"></div>
+</div>
+
+</main>
+
+<footer class="bg-[#701382] text-white text-center py-4 mt-10 max-w-7xl mx-auto">
+    <p>Copyright DonateToCare 2026</p>
+</footer>
+
+<script>
+// BASE_URL loaded from config.js
+// UPLOADS_URL loaded from config.js
+
+function getCategory(){
+    return document.getElementById("categorySelect").value;
+}
+
+function onCategoryChange(){
+    const category = getCategory();
+
+    // Update description hints based on category
+    const noteDesc = document.getElementById("noteDescription");
+    const imgDesc  = document.getElementById("imageDescription");
+
+    if(category === "tracking"){
+        noteDesc.textContent = 'This note will appear as the "Details" text on the Tracking page.';
+        imgDesc.textContent  = 'Images will appear under "Pictures of evidences" on the Tracking page.';
+    } else {
+        noteDesc.textContent = 'This note will appear under "Details" on the payment page.';
+        imgDesc.textContent  = 'Images will appear under "Pictures of evidences" on the payment page.';
+    }
+
+    loadNote();
+    loadImages();
+}
+
+// ── NOTE ──────────────────────────────────────────────
+function loadNote(){
+    const category = getCategory();
+    fetch(BASE_URL + "get_note.php?category=" + category)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("noteInput").value = data.note || "";
+    })
+    .catch(e => console.error(e));
+}
+
+function saveNote(){
+    const category = getCategory();
+    const note = document.getElementById("noteInput").value.trim();
+
+    const noteForm = new FormData();
+    noteForm.append("category", category);
+    noteForm.append("note", note);
+
+    fetch(BASE_URL + "save_note.php", {
+        method: "POST",
+        body: noteForm
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            const msg = document.getElementById("noteSaveMsg");
+            msg.classList.remove("hidden");
+            setTimeout(() => msg.classList.add("hidden"), 2500);
+        } else {
+            alert("Save failed: " + (data.msg || ""));
+        }
+    })
+    .catch(e => { console.error(e); alert("Server error"); });
+}
+
+// ── IMAGES ─────────────────────────────────────────────
+function uploadImage(){
+    const file = document.getElementById("imageInput").files[0];
+    if(!file){ alert("Please select a file first!"); return; }
+
+    const category = getCategory();
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("category", category);
+
+    fetch(BASE_URL + "upload_image.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            const msg = document.getElementById("uploadMsg");
+            msg.classList.remove("hidden");
+            setTimeout(() => msg.classList.add("hidden"), 2500);
+            document.getElementById("imageInput").value = "";
+            loadImages();
+        } else {
+            alert("Upload failed: " + (data.msg || ""));
+        }
+    })
+    .catch(e => { console.error(e); alert("Server error"); });
+}
+
+function loadImages(){
+    const category = getCategory();
+    fetch(BASE_URL + "get_images.php?category=" + category)
+    .then(res => res.json())
+    .then(data => {
+        let html = "";
+        if(!data || data.length === 0){
+            html = "<p class='text-gray-500 col-span-3'>No images uploaded yet.</p>";
+        } else {
+            data.forEach(img => {
+                html += `
+                <div class="border rounded-lg p-2">
+                    <img src="${UPLOADS_URL}${img.image}" class="h-40 w-full object-cover rounded">
+                    <p class="text-sm mt-1 text-gray-500 truncate">${img.image}</p>
+                    <button onclick="deleteImage(${img.id})"
+                        class="bg-red-500 text-white w-full mt-2 py-1 rounded hover:bg-red-600 transition">
+                        🗑 Delete
+                    </button>
+                </div>`;
+            });
+        }
+        document.getElementById("imageList").innerHTML = html;
+    })
+    .catch(e => console.error(e));
+}
+
+function deleteImage(id){
+    if(!confirm("Delete this image?")) return;
+    fetch(BASE_URL + "delete_image.php?id=" + id)
+    .then(() => loadImages());
+}
+
+// Init
+loadNote();
+loadImages();
+</script>
+
+</body>
+</html>

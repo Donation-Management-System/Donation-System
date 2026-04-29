@@ -1,0 +1,29 @@
+# ===========================
+# DonateToCare — .gitignore
+# ===========================
+
+# Environment / secrets — NEVER commit these
+.env
+*.env.local
+
+# Uploaded images (user content — not part of source code)
+backend/uploads/*.jpg
+backend/uploads/*.jpeg
+backend/uploads/*.png
+backend/uploads/*.gif
+backend/uploads/*.webp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+error_log

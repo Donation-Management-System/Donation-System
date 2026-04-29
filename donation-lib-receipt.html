@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<title>Donation Receipt</title>
+    <script src="config.js"></script>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto bg-white shadow mt-10">
+<header class="bg-[#701382] text-white text-center p-10">
+<h1 class="font-bold text-6xl">DonateToCare</h1>
+</header>
+</div>
+
+<main>
+<div class="min-h-[60vh] max-w-4xl mx-auto p-10">
+
+<h2 class="text-4xl text-center mt-6 mb-20">Donation Receipt</h2>
+
+<div class="grid grid-cols-2 gap-y-6 text-2xl bg-white p-10 shadow rounded">
+
+<div>Name:</div>
+<div id="name"></div>
+
+<div>Email:</div>
+<div id="email"></div>
+
+<div>Donated for:</div>
+<div id="category"></div>
+
+<div>Amount:</div>
+<div id="amount"></div>
+
+<div>Status:</div>
+<div id="status"></div>
+
+</div>
+
+<!-- ✅ PAY NOW BUTTON -->
+<div class="text-center mt-10">
+<button onclick="goPayment()" 
+class="bg-green-600 text-white px-8 py-3 rounded hover:bg-green-700">
+Pay Now
+</button>
+</div>
+
+</div>
+</main>
+
+<footer class="bg-[#701382] text-white text-center py-4">
+DonateToCare 2026
+</footer>
+
+<script>
+// BASE_URL loaded from config.js
+
+let currentAmount = 0;
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const donation_id = localStorage.getItem("donation_id");
+
+    console.log("Donation ID:", donation_id);
+
+    if(!donation_id){
+        alert("No donation found!");
+        return;
+    }
+
+    try {
+        const res = await fetch(BASE_URL + "get_receipt.php?donation_id=" + donation_id);
+        const data = await res.json();
+
+        console.log("API Data:", data);
+
+        if(data.error){
+            alert(data.error);
+            return;
+        }
+
+        // ✅ Fill data
+        document.getElementById("name").innerText = data.name || "N/A";
+        document.getElementById("email").innerText = data.email || "N/A";
+        document.getElementById("category").innerText = data.category || "N/A";
+        document.getElementById("amount").innerText = "BDT " + data.amount;
+        document.getElementById("status").innerText = data.status || "Pending";
+
+        // ✅ Save amount for payment
+        currentAmount = data.amount;
+
+    } catch(err){
+        alert("Error loading receipt");
+        console.error(err);
+    }
+});
+
+function goPayment(){
+
+    const donation_id = localStorage.getItem("donation_id");
+
+    if(!donation_id || !currentAmount){
+        alert("Payment data missing!");
+        return;
+    }
+
+    // ✅ SSLCommerz redirect
+    window.location.href = 
+    "http://localhost/Donation-System-main/backend/api/ssl_payment.php?donation_id=" 
+    + donation_id + "&amount=" + currentAmount;
+}
+</script>
+
+</body>
+</html>
